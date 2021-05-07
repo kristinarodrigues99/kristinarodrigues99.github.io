@@ -1,0 +1,71 @@
+---
+title: "Diving into R and Python"
+author: "Kristina Rodrigues"
+date: 2021-05-07
+hiderelated: true
+hidediscus: true
+---
+
+
+![](/post/2021-05-07-test2_files/whale.jpeg)
+
+The majority of this computational biology course has focused on programming language R, the language of statistics. We started off with data visualization, which included probability and plotting distributions. Next, we slipped into DPLYR so that we could learn to construct more elegant-looking tables and graphs. With DPLYR under our belts, we experimented with wrangling and tidying data to make it easier to work with. The results of this first unit can be seen in Project 1 that explores the effect certain storm factors have on sea level.
+
+[Link to project 1](/project/project1/)
+
+The second part of the course dealt with testing the data to study how variables were related and affected each other. This could be seen via randomization tests and ANOVA/MANOVA/PERMANOVAs. In addition, we delved into regression (both linear and logistic) and calculating standard errors to determine if the data met the assumptions of normality. To understand if our models could predict well, we performed AUC, ROC and cross validations. The results of this can be seen in Project 2 that looks into how predictors like storm winds, cateogory, and pressure can determine if a storm is classified as major or minor.
+
+[Link to project 2](/project/project2/)
+
+In the last portion of the course, we covered an introduction to Python and how we could transpose the our coding from R to Python. For example, DPLYR in R translated to pandas in Python. Python is said to be harder to set up and get started in if you are new to coding, but below, we'll explore some of the functions you can perform using this coding language.
+
+
+## Python
+First off, we can use Python like a calculator. Instead of using "<-" to store, we can substitute with an equal sign.
+```{python}
+four = 4
+two = 2
+four + two
+```
+
+###Numpy
+```{python}
+import numpy as np 
+x=np.array([7,8,9,10])
+x
+#we can further use numpy to work with this array
+print(x/10+1)
+#we can determine the size of the array with .shape
+x.shape 
+list=np.array([[7,8],[9,10]])
+list 
+#we can select certain elements from our list 
+list[0,0] #this grabs the first element
+list[0,:] #this grabs the first row 
+```
+*Here, we used function "numpy" to work with arrays. Grabbing elements is slightly different than R, because counting begins with 0 instead of 1.*
+
+### Reticulate
+Below is a demonstration of how to use the "reticulate" function 
+```{r}
+library(reticulate)
+hi<-"Coding is"
+first <- (1:10)
+```
+
+```{python}
+hi="cool"
+first = [11,12,13,14,15,16,17,18,19,20]
+print(r.hi,hi) 
+print(r.first,first)
+```
+*Above, we can see how R and Python interact in a Python cell, but is this possible in an R chunk?*
+
+```{r}
+cat(c(hi,py$hi))
+cat(c(first,py$first))
+```
+*Yes, it is possible to use reticulate in an R chunk and observe the full list when they are combined!*
+
+
+

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Kristina Rodrigues" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../img/favicon.ico">
+    <title>Project_1</title>
+    <meta name="generator" content="Hugo 0.83.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../post/">BLOG</a></li>
+        
+        <li><a href="../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../project/project1/">Project_1</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         January 1, 0001 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<pre class="r"><code>knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = &quot;center&quot;, 
+    warning = F, message = F, tidy = TRUE, tidy.opts = list(width.cutoff = 60), 
+    R.options = list(max.print = 100))</code></pre>
+<div id="kristina-rodrigues-ut-eid-kpr484" class="section level3">
+<h3>Kristina Rodrigues; UT EID: kpr484</h3>
+<p>###Introduction
+<em>Climate change is becoming a hot topic these days with rising temperatures and concurrently an increase in tropical storms. The first dataset I chose focuses on different tropical storms and their characteristics: storm name, year, date of report, coordinates, pressure (in millibars), status, category, and wind speed (in knots). This data was collected from the NOAA Atlantic Hurricane database and was measured frequently during each tropical storm. The second dataset contains the sea level that breached an established threshold over the course of a few years. I chose to examine how sea level related to the characteristics of tropical storms because of my passion for climate change, natural disasters, and the ocean. I previously took a Marine Biology course where we studied ENSO patterns and the tropical storms that ensued during the La Niña and El Niño oscillations. When choosing these datasets, I hoped to understand what categorizes a tropical storm and the effects each one reaps.</em></p>
+</div>
+<div id="tidying-rearranging-widelong" class="section level3">
+<h3>1. Tidying: Rearranging Wide/Long</h3>
+<pre class="r"><code>library(tidyverse)
+sealevel &lt;- read_csv(&quot;sealevel.csv&quot;)
+storms &lt;- read_csv(&quot;storms.csv&quot;)
+storms %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 10,010
+## Columns: 14
+## $ X1          &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17…
+## $ name        &lt;chr&gt; &quot;Amy&quot;, &quot;Amy&quot;, &quot;Amy&quot;, &quot;Amy&quot;, &quot;Amy&quot;, &quot;Amy&quot;, &quot;Amy&quot;, &quot;Amy&quot;, &quot;…
+## $ year        &lt;dbl&gt; 1975, 1975, 1975, 1975, 1975, 1975, 1975, 1975, 1975, 197…
+## $ month       &lt;dbl&gt; 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, …
+## $ day         &lt;dbl&gt; 27, 27, 27, 27, 28, 28, 28, 28, 29, 29, 29, 29, 30, 30, 3…
+## $ hour        &lt;dbl&gt; 0, 6, 12, 18, 0, 6, 12, 18, 0, 6, 12, 18, 0, 6, 12, 18, 0…
+## $ lat         &lt;dbl&gt; 27.5, 28.5, 29.5, 30.5, 31.5, 32.4, 33.3, 34.0, 34.4, 34.…
+## $ long        &lt;dbl&gt; -79.0, -79.0, -79.0, -79.0, -78.8, -78.7, -78.0, -77.0, -…
+## $ status      &lt;chr&gt; &quot;tropical depression&quot;, &quot;tropical depression&quot;, &quot;tropical d…
+## $ category    &lt;dbl&gt; -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ wind        &lt;dbl&gt; 25, 25, 25, 25, 25, 25, 25, 30, 35, 40, 45, 50, 50, 55, 6…
+## $ pressure    &lt;dbl&gt; 1013, 1013, 1013, 1013, 1012, 1012, 1011, 1006, 1004, 100…
+## $ ts_diameter &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ hu_diameter &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…</code></pre>
+<pre class="r"><code>storms1 &lt;- storms %&gt;% pivot_longer(cols = c(&quot;ts_diameter&quot;, &quot;hu_diameter&quot;), 
+    names_to = &quot;storm_type&quot;, values_to = &quot;diameter&quot;)
+storms1 &lt;- storms1 %&gt;% separate(storm_type, into = c(&quot;type&quot;, 
+    NA), sep = 2)
+storms1 &lt;- storms1 %&gt;% pivot_longer(c(&quot;lat&quot;:&quot;long&quot;), names_to = &quot;coordinates&quot;, 
+    values_to = &quot;coordinate_values&quot;)
+storms1 %&gt;% na.omit()</code></pre>
+<pre><code>## # A tibble: 6,252 x 14
+##       X1 name   year month   day  hour status category  wind pressure type 
+##    &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;
+##  1  6472 Alex   2004     7    31    18 tropi…       -1    25     1010 ts   
+##  2  6472 Alex   2004     7    31    18 tropi…       -1    25     1010 ts   
+##  3  6472 Alex   2004     7    31    18 tropi…       -1    25     1010 hu   
+##  4  6472 Alex   2004     7    31    18 tropi…       -1    25     1010 hu   
+##  5  6473 Alex   2004     8     1     0 tropi…       -1    25     1009 ts   
+##  6  6473 Alex   2004     8     1     0 tropi…       -1    25     1009 ts   
+##  7  6473 Alex   2004     8     1     0 tropi…       -1    25     1009 hu   
+##  8  6473 Alex   2004     8     1     0 tropi…       -1    25     1009 hu   
+##  9  6474 Alex   2004     8     1     6 tropi…       -1    25     1009 ts   
+## 10  6474 Alex   2004     8     1     6 tropi…       -1    25     1009 ts   
+## # … with 6,242 more rows, and 3 more variables: diameter &lt;lgl&gt;,
+## #   coordinates &lt;chr&gt;, coordinate_values &lt;dbl&gt;</code></pre>
+<pre class="r"><code>storms1 &lt;- select(storms1, -diameter, -X1)
+storms1 %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 40,040
+## Columns: 12
+## $ name              &lt;chr&gt; &quot;Amy&quot;, &quot;Amy&quot;, &quot;Amy&quot;, &quot;Amy&quot;, &quot;Amy&quot;, &quot;Amy&quot;, &quot;Amy&quot;, &quot;A…
+## $ year              &lt;dbl&gt; 1975, 1975, 1975, 1975, 1975, 1975, 1975, 1975, 197…
+## $ month             &lt;dbl&gt; 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, …
+## $ day               &lt;dbl&gt; 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27,…
+## $ hour              &lt;dbl&gt; 0, 0, 0, 0, 6, 6, 6, 6, 12, 12, 12, 12, 18, 18, 18,…
+## $ status            &lt;chr&gt; &quot;tropical depression&quot;, &quot;tropical depression&quot;, &quot;trop…
+## $ category          &lt;dbl&gt; -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,…
+## $ wind              &lt;dbl&gt; 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,…
+## $ pressure          &lt;dbl&gt; 1013, 1013, 1013, 1013, 1013, 1013, 1013, 1013, 101…
+## $ type              &lt;chr&gt; &quot;ts&quot;, &quot;ts&quot;, &quot;hu&quot;, &quot;hu&quot;, &quot;ts&quot;, &quot;ts&quot;, &quot;hu&quot;, &quot;hu&quot;, &quot;ts…
+## $ coordinates       &lt;chr&gt; &quot;lat&quot;, &quot;long&quot;, &quot;lat&quot;, &quot;long&quot;, &quot;lat&quot;, &quot;long&quot;, &quot;lat&quot;,…
+## $ coordinate_values &lt;dbl&gt; 27.5, -79.0, 27.5, -79.0, 28.5, -79.0, 28.5, -79.0,…</code></pre>
+<p><em>The “storms” dataset contains a couple extra columns, such as the diameter of tsunamis and hurricanes, so I merged “ts_diameter” and “hu_diameter” into “type” to show the type of storm. There were no values in the “diameter” column, so I removed it from the dataset. This helped tidy the “storms” dataset (renamed as storms1). To do this, I used the “pivot_longer” function to rearrange my data as longer rather than wider. I also omitted NAs and columns that I deemed unnecessary for the analyzing in this project (i.e. diameter and X1).</em></p>
+</div>
+<div id="joiningmerging" class="section level3">
+<h3>2. Joining/Merging</h3>
+<pre class="r"><code>merged &lt;- storms1 %&gt;% full_join(sealevel, by = c(year = &quot;Year&quot;))
+merged &lt;- merged %&gt;% na.omit()
+merged &lt;- select(merged, -X1)
+dim(merged)</code></pre>
+<pre><code>## [1] 6816   13</code></pre>
+<p><em>I merged the two datasets together using the full_join function because I didn’t want to drop any rows, even if there wasn’t a match. The “sealevel” dataset only contains 2 columns: “year” and “sea level”, so I wanted to preserve all the entries before omitting any NAs. The common variable between the “storms1” dataset and the “sealevel” dataset was named differently, one being “Year” and the other being “year”, so I had to merge keeping that in mind. There were multiple observations for the joining variable, but each row had unique characteristics relative to the year, so only ended up omitting NAs rather than collapsing. I also omitted the NAs to further clean up the dataset and make it more usable when working with summary statistics and for developing plots. After dropping these NA values, the merged dataset contains 6,816 rows and 13 columns.</em></p>
+</div>
+<div id="wrangling" class="section level3">
+<h3>3. Wrangling</h3>
+<pre class="r"><code>merged %&gt;% filter(category &gt;= 3) %&gt;% arrange(desc(SeaLevel)) %&gt;% 
+    select(month, category, SeaLevel)</code></pre>
+<pre><code>## # A tibble: 252 x 3
+##    month category SeaLevel
+##    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+##  1     9        3     4.55
+##  2     9        3     4.55
+##  3     9        3     4.55
+##  4     9        3     4.55
+##  5     9        3     4.55
+##  6     9        3     4.55
+##  7     9        3     4.55
+##  8     9        3     4.55
+##  9     9        3     4.55
+## 10     9        3     4.55
+## # … with 242 more rows</code></pre>
+<pre class="r"><code>merged &lt;- merged %&gt;% mutate(`pressure_n/m2` = pressure * 100)
+merged %&gt;% summarize(mean(SeaLevel), median(SeaLevel), min(SeaLevel), 
+    max(SeaLevel), first(SeaLevel), last(SeaLevel))</code></pre>
+<pre><code>## # A tibble: 1 x 6
+##   `mean(SeaLevel)` `median(SeaLeve… `min(SeaLevel)` `max(SeaLevel)`
+##              &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;
+## 1             3.96              3.9            3.62            4.55
+## # … with 2 more variables: `first(SeaLevel)` &lt;dbl&gt;, `last(SeaLevel)` &lt;dbl&gt;</code></pre>
+<pre class="r"><code>merged %&gt;% summarize(mean(category), median(category), min(category), 
+    max(category), first(category), last(category))</code></pre>
+<pre><code>## # A tibble: 1 x 6
+##   `mean(category)` `median(categor… `min(category)` `max(category)`
+##              &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;
+## 1            0.157                0              -1               5
+## # … with 2 more variables: `first(category)` &lt;dbl&gt;, `last(category)` &lt;dbl&gt;</code></pre>
+<pre class="r"><code>merged %&gt;% summarize(mean(pressure), median(pressure), min(pressure), 
+    max(pressure), first(pressure), last(pressure))</code></pre>
+<pre><code>## # A tibble: 1 x 6
+##   `mean(pressure)` `median(pressur… `min(pressure)` `max(pressure)`
+##              &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;
+## 1             996.             1000             920            1016
+## # … with 2 more variables: `first(pressure)` &lt;dbl&gt;, `last(pressure)` &lt;dbl&gt;</code></pre>
+<pre class="r"><code>merged %&gt;% summarize(mean(coordinate_values), median(coordinate_values), 
+    min(coordinate_values), max(coordinate_values), first(coordinate_values), 
+    last(coordinate_values))</code></pre>
+<pre><code>## # A tibble: 1 x 6
+##   `mean(coordinat… `median(coordin… `min(coordinate… `max(coordinate…
+##              &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1            -20.5             -5.6             -103             51.8
+## # … with 2 more variables: `first(coordinate_values)` &lt;dbl&gt;,
+## #   `last(coordinate_values)` &lt;dbl&gt;</code></pre>
+<pre class="r"><code>merged %&gt;% summarize(mean(month), median(month), min(month), 
+    max(month), first(month), last(month))</code></pre>
+<pre><code>## # A tibble: 1 x 6
+##   `mean(month)` `median(month)` `min(month)` `max(month)` `first(month)`
+##           &lt;dbl&gt;           &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;          &lt;dbl&gt;
+## 1          8.78               9            6           12              6
+## # … with 1 more variable: `last(month)` &lt;dbl&gt;</code></pre>
+<pre class="r"><code>merged %&gt;% summarize(mean(name), median(name), min(name), max(name), 
+    first(name), last(name))</code></pre>
+<pre><code>## # A tibble: 1 x 6
+##   `mean(name)` `median(name)` `min(name)` `max(name)` `first(name)` `last(name)`
+##          &lt;dbl&gt;          &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;         &lt;chr&gt;       
+## 1           NA             NA AL031987    Lili        Amy           Floyd</code></pre>
+<pre class="r"><code>merged %&gt;% group_by(year) %&gt;% summarize(mean_sealevel = mean(SeaLevel), 
+    min_pressure = min(pressure), last_storm = last(name))</code></pre>
+<pre><code>## # A tibble: 13 x 4
+##     year mean_sealevel min_pressure last_storm
+##    &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt; &lt;chr&gt;     
+##  1  1975          3.91          963 Doris     
+##  2  1976          3.72          957 Gloria    
+##  3  1977          4             926 Evelyn    
+##  4  1978          3.66          980 Juliet    
+##  5  1979          3.62          924 Henri     
+##  6  1980          4.33          970 Karl      
+##  7  1981          4.55          946 Katrina   
+##  8  1982          3.75          950 Ernesto   
+##  9  1983          4.08          962 Dean      
+## 10  1984          3.9           949 Lili      
+## 11  1985          3.88          920 Kate      
+## 12  1986          3.94          987 Danielle  
+## 13  1987          4.33          958 Floyd</code></pre>
+<pre class="r"><code>merged %&gt;% group_by(status) %&gt;% summarize(median_category = median(category), 
+    max_coordinates = max(coordinate_values), first_month = first(month))</code></pre>
+<pre><code>## # A tibble: 3 x 4
+##   status              median_category max_coordinates first_month
+##   &lt;chr&gt;                         &lt;dbl&gt;           &lt;dbl&gt;       &lt;dbl&gt;
+## 1 hurricane                         1            50.8           8
+## 2 tropical depression              -1            41.7           6
+## 3 tropical storm                    0            51.8           6</code></pre>
+<pre class="r"><code>correlation &lt;- merged %&gt;% select_if(is.numeric) %&gt;% cor(use = &quot;pair&quot;)
+merged %&gt;% summarize(cor(pressure, wind, use = &quot;pair&quot;))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   `cor(pressure, wind, use = &quot;pair&quot;)`
+##                                 &lt;dbl&gt;
+## 1                              -0.916</code></pre>
+<p><em>The severity of tropical storms increases with category (on a scale of 1-5), so I wanted to observe both the sea level for these higher category storms as well as when they primarily occur. Tropical storms usually peak in the fall from August to late October, and by filtering for higher category storms, I could confirm that the most severe tropical storms happened from August to September. By selecting for these three specific columns, I could see how they related to each other, such as how higher category storms showed higher sea levels and happened during the peak storm season. I created a new variable using mutate to convert pressure in millibars to Newtons per meter squared, which is a more conventional pressure unit and easier to visualize when understanding storm severity.</em></p>
+<p><em>I used summary statistics (namely “summarize” and “group_by” on multiple variables to see how they appear during certain years and storm statuses. The summary statistics (mean, median, min, max, first, and last) for multiple variables are shown above and show the characteristics of these tropical storms overall. When grouped by year, I could see the average sea level, minimum pressure and last storm for each year. When grouped by storm status, I could see the median category, the maxiumim coordinates, and the first month a storm occurred based on status. Results are shown above in tables. I chose 2 variables (wind speed and pressure) and studied their correlation, which was -0.916, meaning wind speed and pressure are strongly, negatively correlated.</em></p>
+</div>
+<div id="visualizing" class="section level3">
+<h3>4. Visualizing</h3>
+<pre class="r"><code>tidy_correlation &lt;- correlation %&gt;% as.data.frame %&gt;% rownames_to_column(&quot;variable_1&quot;) %&gt;% 
+    pivot_longer(-1, names_to = &quot;variable_2&quot;, values_to = &quot;correlation&quot;)
+tidy_correlation %&gt;% ggplot(aes(variable_1, variable_2, fill = correlation)) + 
+    geom_tile() + scale_fill_gradient2(low = &quot;green&quot;, mid = &quot;sky blue&quot;, 
+    high = &quot;yellow&quot;) + geom_text(aes(label = round(correlation, 
+    2)), color = &quot;black&quot;, size = 3) + theme(axis.text.x = element_text(angle = 45, 
+    hjust = 0.9)) + coord_fixed() + ggtitle(&quot;Correlation Heatmap&quot;)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" />
+<em>After plotting a correlation heatmap to see how strongly each of the variables are related, I observed that there was a strong, positive correlation (between wind and category). I also observed a strong, negative correlation between wind speed and pressure (pressure measured in millibars and the mutated pressure column measured in N/m^2). I created the heatmap using ggplot and changed the coloration to easily visualize which variables were positively and negatively correlated.</em></p>
+<pre class="r"><code>merged %&gt;% group_by(month, type) %&gt;% summarize(mean_sealevel = mean(SeaLevel), 
+    sd_sealevel = sd(SeaLevel), count_sealevel = n(), se_sealevel = sd_sealevel/sqrt(count_sealevel)) %&gt;% 
+    ggplot(aes(month, mean_sealevel)) + geom_bar(stat = &quot;identity&quot;, 
+    aes(fill = type)) + geom_errorbar(aes(x = month, y = mean_sealevel, 
+    ymin = mean_sealevel - se_sealevel, ymax = mean_sealevel + 
+        se_sealevel)) + facet_wrap(~type) + scale_x_continuous(breaks = seq(1, 
+    12)) + ggtitle(&quot;Faceting by Storm Type&quot;) + scale_fill_brewer(palette = &quot;Greens&quot;)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" />
+<em>I was curious to see how sea level differed by month for hurricanes versus tropical storms. It looks like the sea level for both was very similar, and this could be because the measurements were taken in the same area (in the Atlantic) and that these storms overlapped each other. Hurricanes can be classified as tropical storms after crossing a threshold, so it could be possible that many storms started as hurricanes byt morphed into tropical storms, which is why the data between the two for average sea level is so similar.</em></p>
+<pre class="r"><code>ggplot(data = merged, aes(x = year, y = pressure, color = status, 
+    shape = status, group = status)) + geom_point(stat = &quot;summary&quot;, 
+    fun = mean, aes(color = status)) + ggtitle(&quot;Pressure of Storm Per Year&quot;) + 
+    ylab(&quot;Pressure (in millibars)&quot;) + xlab(&quot;Year&quot;) + scale_color_brewer()</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" />
+<em>Tropical storms, such as cyclones and hurricanes, are characterized by their significant drop in air pressure. Based on the scatterplot, tropical storms and depressions showed a dip in pressure between 1979 and 1983, the years that boasted some of the highest category tropical storms, such as Typhoon Tip. Pressure appears to be lower during tropical storms than it is for tropical depressions. This solidifies the fact that tropical storms are more destructive and higher category storms than tropical depressions. They boast higher wind speeds and lower pressures.</em></p>
+<p>###5. Dimensionality Reduction</p>
+<pre class="r"><code>library(cluster)
+library(GGally)
+library(plotly)
+
+cluster &lt;- merged %&gt;% dplyr::select(category, pressure, wind)
+pam &lt;- cluster %&gt;% pam(k = 1)
+pamcluster &lt;- cluster %&gt;% mutate(cluster = as.factor(pam$clustering))
+pamcluster %&gt;% ggplot(aes(category, pressure, wind, color = cluster)) + 
+    geom_point()</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>pamcluster %&gt;% group_by(cluster) %&gt;% summarize_if(is.numeric, 
+    mean, na.rm = T)</code></pre>
+<pre><code>## # A tibble: 1 x 4
+##   cluster category pressure  wind
+##   &lt;fct&gt;      &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;
+## 1 1          0.157     996.  50.3</code></pre>
+<pre class="r"><code>kmeans &lt;- cluster %&gt;% kmeans(1)
+kmeanscluster &lt;- cluster %&gt;% mutate(cluster = as.factor(kmeans$cluster))
+kmeanscluster %&gt;% ggplot(aes(category, pressure, wind, color = cluster)) + 
+    geom_point()</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-8-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>wss &lt;- vector()
+for (i in 1:10) {
+    finalcorrelation &lt;- merged %&gt;% dplyr::select(category, pressure, 
+        wind) %&gt;% kmeans(., i + 1)
+    wss[i] &lt;- finalcorrelation$tot.withinss
+}
+ggplot() + geom_point(aes(x = 1:10, y = wss)) + geom_path(aes(x = 1:10, 
+    y = wss)) + xlab(&quot;clusters&quot;) + scale_x_continuous(breaks = 1:10)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-8-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>cluster_data &lt;- merged %&gt;% select_if(is.numeric) %&gt;% scale %&gt;% 
+    pam(1)
+PAM_1 &lt;- merged %&gt;% select_if(is.numeric) %&gt;% scale %&gt;% pam(1)
+
+
+ggpairs(pamcluster, columns = 1:3, aes(color = cluster))</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-8-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>plot(PAM_1, which = 1)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-8-5.png" width="672" style="display: block; margin: auto;" />
+<em>I performed PAM and k-means on three numeric variables (category, pressure, and wind), using both methods to double check the variable correlations. After performing k-means, 1 cluster is the best number of clusters to use. This could be because the data is not spread out enough to form clusters. I proceeded to use PAM on all my numeric variables and visualize their clustering, which also showed my data was not very spread out and rather concentrated. Using GGally, I determined the pairwise combinations between pressure, category, and wind. I learned how correlated these variables were. After performing a clustering plot function (which=1), I learned that my numeric variables explain 53.37% of the point variability.</em></p>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../js/docs.min.js"></script>
+<script src="../../js/main.js"></script>
+
+<script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

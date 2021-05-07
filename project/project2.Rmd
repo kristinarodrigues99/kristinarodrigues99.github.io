@@ -1,0 +1,306 @@
+---
+title: "Project 2"
+author: "Kristina Rodrigues"
+date: "5/4/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", 
+    warning = F, message = F, tidy = TRUE, tidy.opts = list(width.cutoff = 60), 
+    R.options = list(max.print = 100))
+```
+
+### Kristina Rodrigues; UT EID: kpr484 
+
+### Introduction
+
+*Our earth is slowly changing due to our carbon footprint and global warming. This has resulted in more intense, harder-to-predict natural disasters that have been taking the world by storm. In my previous project, I looked at the at how different factors impacted the intensity of storms by looking at sealevel. In this project, I will be using the same dataset to observe just how each environmental factor impacts and strongly affects tropical storms. The  dataset includes information on various tropical storms and their characteristics: storm name, year, date of report, coordinates, pressure (in millibars), status, category, and wind speed (in knots). This data was collected from the NOAA Atlantic Hurricane database and was measured frequently during each tropical storm. After wrangling the "storms" dataset and adding a binary variable, the dataset contains 40,040 observations, but I sliced it down to 1,000 observations so that it would be easier to work with. It also contains 13 variables. In a previous Marine Ecology course, I learned just how badly storms have been evolving due to climate change, so I hope to understand what factors are best for predicting the intensity of a storm so people can prepare accordingly.*
+
+### Setting up the Dataset
+```{r}
+library(tidyverse)
+storms <- read_csv("storms.csv")
+storms <- storms %>% pivot_longer(cols=c("ts_diameter","hu_diameter"), names_to="storm_type", values_to="diameter")
+storms <- storms %>% separate(storm_type,into = c("type", NA), sep=2)
+storms <- storms %>% pivot_longer(c("lat":"long"), names_to="coordinates",values_to="coordinate_values")
+storms %>% na.omit()
+storms <- select(storms, -diameter, -X1)
+storms$storm_type<-ifelse(storms$category>2,"Major","Minor")
+storms <- storms %>% slice(1:1000)
+storms %>% head()
+dim(storms)
+```
+*I wrangled my data by pivoting longer to rid the dataset of excess and unwanted columns that were filled with NAs. I also added a binary variable (storm_type) that dictates if a storm is considered major or minor based on its category. A storm is considered major if it has a category that exceeds 2, so I used this criteria to create my binary variable column. Higher category storms are considered extreme and have wind speeds of high intensity, which I thought would be an interesting factor to look at.*
+
+
+### MANOVA Testing
+```{r}
+manova_1<-manova(cbind(category,wind,pressure)~status, data=storms)
+summary(manova_1) #manova, everything is significant
+summary.aov(manova_1) #univariate ANOVA from MANOVA object; we performed 3
+storms%>% group_by(status)%>%summarize(mean(category),mean(wind),mean(pressure))
+pairwise.t.test(storms$category,storms$status, p.adj="none")
+pairwise.t.test(storms$wind,storms$status, p.adj="none")
+pairwise.t.test(storms$pressure,storms$status, p.adj="none") #performed 9 t-tests
+
+library(mvtnorm)
+library(ggExtra)
+1-(0.95)^13 # probability of Type I error
+0.05/13 #Bonferroni correction
+ggplot(storms, aes(x = pressure, y = wind)) +  geom_point(alpha = .5) + geom_density_2d(h=8) + coord_fixed() + facet_wrap(~status)
+
+library(rstatix)
+group <- storms$status 
+DVs <- storms %>% select(category,wind,pressure)
+lapply(split(DVs,group), cov) 
+
+
+
+```
+*A MANOVA was conducted to observe the effect of storm status (tropical depression, tropical storm, hurricane) on three dependent variables: category, wind, and pressure. Looking at a bivariate plots for each storm status revealed that there were major breaches from multivariate normality. After observing covariance matrices based on storm status, it was seen that that relative homogeneity was not met. There appear to be outliers in the dataset, so performing a MANOVA might not be the best method to study the effect of storm status on category, wind, and pressure.*
+
+*Significant differences were observed among the three storm statuses (hurricane, tropical storm, and tropical depression) for at least one of the dependent variables, Pillai trace = 0.87125, pseudo F = 256.26, p < 0.0001.*
+
+*To follow up and look more closely at each dependent variable, 3 univariate ANOVAs were conducted. The probability of a Type I error (1-(0.95)^13 = 0.4866579) and the Bonferroni correction (0.003846154) were taken into account while performing the univariate ANOVAs. The ANOVAs for category (F = 2195.8, p < 0.0001), wind (F = 2133.8, p < 0.0001), and pressure (F = 842.4, p < 0.0001) all showed significance.*
+
+*To further examine which storm statuses differed in category, wind, and pressure, 9 post-hoc t-test analyses were performed. Hurricane, tropical storm, and tropical depression all differed significantly from each other when looking at category, wind, and pressure after performing a Bonferroni correction to adjust for multiple comparisons (bonferroni alpha = 0.05/13 = 0.003846154). In total, 13 tests were performed (1 MANOVA, 3 ANOVAs, 9 post-hoc t-tests). *
+
+
+### Randomization Test
+```{r}
+Fstat<-vector()
+for(i in 1:10000){  
+  g1<-rnorm(13) 
+  g2<-rnorm(13)  
+  g3<-rnorm(13)  
+  SSW<- sum((g1-mean(g1))^2+(g2-mean(g2))^2+(g3-mean(g3))^2)  
+  SSB<- 36*sum( (mean(c(g1,g2,g3))-c(mean(g1),mean(g2),mean(g3)))^2 ) 
+  Fstat[i]<- (SSB/2)/(SSW/997)
+}
+(SSB/2)/(SSW/997)
+qf(0.95, df1 = 2, df2 = 997)
+obs_F <- 49.38716
+hist(Fstat, prob=T); abline(v = obs_F, col="red", add=T)
+mean(Fstat>obs_F) 
+
+ggplot(storms,aes(wind,fill=status))+geom_histogram(bins=6.5)+  facet_wrap(~status,ncol=2)+theme(legend.position="none")
+
+```
+*The null hypothesis states that the true mean of storm status is the same for all groups. The alternative hypothesis states that at least one of the means will differ from the others. I chose to perform an F-statistic randomization test to see how large the variation between groups is. The F-statistic (49.38716), showing that the variation between groups is large relative to the variation within groups. After running a one-way ANOVA, the p-value was 0.5346, also depicted in the histogram above. This showed that out of the 10,000 F-statistics that we generated under the null hypothesis, a some of the F-statistics were greater than the actual F-stat of 49.38716. This allows us to fail to reject the null hypothesis that the true mean of storm status is the same for all groups, and we can conclude the groups do not differ. The second histogram shows the actual mean difference between storm status groups.*
+
+
+### Linear Regression Model
+```{r}
+library(tidyverse)
+library(sandwich)
+library(lmtest)
+storms_1 <- storms %>% mutate(wind_centered=wind-(mean(wind, na.rm = T)))
+storms_1 %>% head()
+mean(storms_1$wind)
+fit1<-lm(category ~ storm_type*wind_centered, data=storms_1) 
+storms_1%>%ggplot(aes(category,wind_centered))+geom_point()+geom_smooth(method = 'lm',se=F)
+summary(fit1) #talk about R
+coeftest(fit1, vcov=vcovHC(fit1))
+
+#checking assumptions
+resids<-lm(category ~ storm_type*wind_centered, data=storms_1)$residuals
+ggplot()+geom_histogram(aes(resids), bins=20) #looks somewhat off
+fitted<-lm(category ~ storm_type*wind_centered, data=storms_1)$fitted.values
+ggplot()+geom_point(aes(fitted,resids)) #appears slightly fanned out
+resids<-fit1$residuals
+shapiro.test(resids) 
+fitvals<-fit1$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, color='red') #slight fanning; appears homoskedastic
+bptest(fit1) 
+coeftest(fit1, vcov=vcovHC(fit1))[,1:2] #robust SEs
+
+library(interactions)
+interact_plot(fit1,category, wind_centered, plot.points = T)
+```
+*I performed a linear regression model predicting storm category from wind speeds and storm type After centering wind speed and storm pressure (numeric predicting variables), we can see the difference in  category for storm type at the average wind speed (wind_centered = 0 -> wind = 50.64). The intercept (0.614669) is the predicted storm category for major storms with an average wind speed. For storms with an average wind speed, minor storms have an average category that is 0.512039 less than major storms. For every 1 unit increase in wind speed, predicted storm category increases by 0.046092 for storms classified as major. The slope of wind on storm category for minor storms is 0.004761 less than for major storms (not significant). The proportion of variation in storm category is 0.944, meaning that 94.4% of the variability in storm category is explained. However, after performing a Shapiro-Wilk test to assess normality, the data seems to violate the assumptions of normality. I also performed an interaction plot, which shows the data doesn't appear to be normally distributed.*
+
+*Next, I created a scatterplot to check whether homoskedasticity is met, which is typically when the points are equally distributed across the plot. The histogram shows a normal distribution, but the scatterplots of the fitted residuals show a pattern among the points, which violates homoskedasticity. The Breusch-Pagan (bp) test (bp = 31.792) looks directly at whether homoskedasticity has been met, which it has not been (p < 0.05). The p-value was significant, so we reject the null hypothesis of homoskedasticity. The robust standard errors look better after using heteroskedastic methods to observe the relationship between storm category and wind speeds, especially for the effect on storms classified as minor.*
+
+
+### Bootstrapped Standard Errors
+```{r}
+#bootstrap SE, note changes?
+fit2<-lm(category ~ storm_type*wind_centered,data=storms_1)
+resids<-fit2$residuals
+fitted<-fit2$fitted.values 
+resid_resamp<-replicate(5000,{    
+  new_resids<-sample(resids,replace=TRUE)    
+  storms_1$new_y<-fitted+new_resids     
+  fit2<-lm(new_y~storm_type+wind_centered,data=storms_1) 
+  coef(fit2) 
+  })
+resid_resamp%>%t%>%as.data.frame%>%summarize_all(sd)
+```
+*After bootstrapping the standard errors by residuals, I still noticed that wind_centered was significant; however, the boostrapped standard error for storm_typeMinor was less than the robust standard error. We barely fail to reject the null for storm_typeMinor and reject the null for wind_centered.This means that wind_centered was still significant after sampling from a dataset with replacement.*
+
+
+### Logistic Regression Model Predicting a Binary Variable
+```{r}
+library(tidyverse)
+library(lmtest)
+library(plotROC)
+storms_data <- storms %>% mutate(y=ifelse(storm_type=="Major",1,0))
+storms_data %>% head()
+fit3 <- glm(y ~ category+wind, data = storms_data)
+summary(fit3)
+coeftest(fit3)
+exp(coef(fit3))
+
+probs <- predict (fit3, type = "response")
+class_diag<-function(probs,truth){
+  
+  tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),truth)
+  acc=sum(diag(tab))/sum(tab)
+  sens=tab[2,2]/colSums(tab)[2]
+  spec=tab[1,1]/colSums(tab)[1]
+  ppv=tab[2,2]/rowSums(tab)[2]
+
+  if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+  
+  #CALCULATE EXACT AUC
+  ord<-order(probs, decreasing=TRUE)
+  probs <- probs[ord]; truth <- truth[ord]
+  
+  TPR=cumsum(truth)/max(1,sum(truth)) 
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  
+  dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+  TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+  
+  n <- length(TPR)
+  auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+  data.frame(acc,sens,spec,ppv,auc)
+}
+class_diag(probs, storms_data$y)
+table(predict = as.numeric(probs>0.5), truth = storms_data$y) %>% addmargins
+(964 + 8)/1000 #Accuracy
+964/992 #Sensitivity (TPR)
+8/8 #Specificity (TNR)
+964/964 #Precision (PPV)
+ROC_plot <- ggplot(storms_data)+
+  geom_roc(aes(d=y,m=probs), n.cuts=0)
+ROC_plot
+calc_auc(ROC_plot)
+
+storms_data$logit<-predict(fit3, type = "response")
+storms_data%>%ggplot()+geom_density(aes(logit,color=storm_type,fill=storm_type), alpha=.4)+
+  theme(legend.position=c(.85,.85))+geom_vline(xintercept=0)+xlab("predictor (logit)")
+```
+*No interaction was observed in this logistic regression. The odds of a tropical storm being classified as a major storm is 1.409. The odds of a storm classified as major having a category above 2 is 1.267 times the odds for minor storms. The odds of a major storm having a high wind speed is 0.993 times the odds the odds of a minor storm having a high wind speed. This shows that storms that are of higher category and higher wind speed effect whether a storm is classified as major or minor. A confusion matrix was performed above (accuracy = 0.972, TPR = 0.971, TNR = 1, PPV =1, AUC =1). With an AUC score of 1, the model is considered great at being able to predict the classification of storm type. The ROC plot shows a sharp 90-degree angle, which helps us visualize the interaction between specifity and sensitivity. The density plot shows the distrubution of log odds for each group (storm type by classification as either major or minor.)*
+
+
+### Logistic Regression Model From ALL Remaining Variables
+```{r}
+library(glmnet)
+fit4<-glm(y~wind+category+pressure, data=storms_data)
+summary(fit4)
+coeftest(fit4)
+exp(coef(fit4))
+
+probs_1 <- predict (fit4, type = "response")
+class_diag<-function(probs_1,truth){
+  
+  tab<-table(factor(probs_1>.5,levels=c("FALSE","TRUE")),truth)
+  acc=sum(diag(tab))/sum(tab)
+  sens=tab[2,2]/colSums(tab)[2]
+  spec=tab[1,1]/colSums(tab)[1]
+  ppv=tab[2,2]/rowSums(tab)[2]
+
+  if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+  
+  #CALCULATE EXACT AUC
+  ord<-order(probs_1, decreasing=TRUE)
+  probs_1 <- probs_1[ord]; truth <- truth[ord]
+  
+  TPR=cumsum(truth)/max(1,sum(truth)) 
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  
+  dup<-c(probs_1[-1]>=probs[-length(probs_1)], FALSE)
+  TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+  
+  n <- length(TPR)
+  auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+  data.frame(acc,sens,spec,ppv,auc)
+}
+class_diag(probs_1, storms_data$y)
+table(predict = as.numeric(probs_1>0.5), truth = storms_data$y) %>% addmargins
+(964 + 12)/1000 #Accuracy
+12/36 #Sensitivity (TPR)
+12/12 #Specificity (TNR)
+964/964 #Precision (PPV)
+ROC_plot_1 <- ggplot(storms_data)+
+  geom_roc(aes(d=y,m=probs_1), n.cuts=0)
+ROC_plot_1
+calc_auc(ROC_plot_1)
+
+
+
+#LASSO
+y <- storms_data$y %>% as.matrix
+x <- model.matrix(y~-1+., data = storms_data)
+CV <- cv.glmnet(x,y, family = "binomial")
+cv <- cv.glmnet(x,y)
+{plot(cv$glmnet.fit, "lambda", label=TRUE); abline(v = log(cv$lambda.1se)); abline(v = log(cv$lambda.min),lty=2)}
+
+lasso <- glmnet(x,y, family = "binomial", lambda = CV$lambda.2se)
+coef(lasso)
+storms_data %>% head()
+lasso_data <- storms_data %>% mutate(minor_storm=ifelse(storm_type == "Major", 1,0))
+head(lasso_data)
+lasso_data <- lasso_data %>% select(13:15)
+lasso_fit <- glm(y~., data = lasso_data, family="binomial")
+lasso_probs <- predict (lasso_fit, type = "response")
+class_diag<-function(lasso_probs,truth){
+  
+  tab<-table(factor(lasso_probs>.5,levels=c("FALSE","TRUE")),truth)
+  acc=sum(diag(tab))/sum(tab)
+  sens=tab[2,2]/colSums(tab)[2]
+  spec=tab[1,1]/colSums(tab)[1]
+  ppv=tab[2,2]/rowSums(tab)[2]
+
+  if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+  
+  #CALCULATE EXACT AUC
+  ord<-order(lasso_probs, decreasing=TRUE)
+  lasso_probs <- lasso_probs[ord]; truth <- truth[ord]
+  
+  TPR=cumsum(truth)/max(1,sum(truth)) 
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  
+  dup<-c(lasso_probs[-1]>=probs[-length(lasso_probs)], FALSE)
+  TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+  
+  n <- length(TPR)
+  auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+  data.frame(acc,sens,spec,ppv,auc)
+}
+
+class_diag(lasso_probs, lasso_data$y)
+table (lasso_data$y, lasso_probs > 0.5)
+
+
+#10-fold CV on LASSO
+k=10
+data5<-lasso_data[sample(nrow(lasso_data)),] 
+folds<-cut(seq(1:nrow(lasso_data)),breaks=k,labels=F)
+diags5<-NULL
+```
+*A logistic regression was run predicting the binary response variable of storm type (major or minor) from the rest of the variables (accuracy = 0.976, TPR = 0.33, TNR = 1, PPV = 1, auc = 0.916). The AUC for predicting from all variables (auc = 0.9164938) was lower than the AUC for predicting a binary variable (auc = 1). The 10-fold cross validation showed signs of overfitting for the sensitivity because the AUC was 0.848, which was lower when just looking at the logistic regression of the binary variable. LASSO was performed on the same model, and the classification of storm type was retained. The lambda was calculated above and thought best to maximize the CV classification (2). Finally, a 10-fold CV was performed on the variables LASSO selected, bringing the AUC up to 0.8902, which is considered great and an improvement after performing LASSO.*
+
+```{r}
+
+```
+

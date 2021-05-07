@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Kristina Rodrigues" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../img/favicon.ico">
+    <title>Diving into R and Python</title>
+    <meta name="generator" content="Hugo 0.83.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../../../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../../../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../../../../post/">BLOG</a></li>
+        
+        <li><a href="../../../../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../../../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../../../../post/2021/05/07/diving-into-r-and-python/">Diving into R and Python</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         May 7, 2021 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<p><img src="../../../../../post/2021-05-07-test2_files/whale.jpeg" /></p>
+<p>The majority of this computational biology course has focused on programming language R, the language of statistics. We started off with data visualization, which included probability and plotting distributions. Next, we slipped into DPLYR so that we could learn to construct more elegant-looking tables and graphs. With DPLYR under our belts, we experimented with wrangling and tidying data to make it easier to work with. The results of this first unit can be seen in Project 1 that explores the effect certain storm factors have on sea level.</p>
+<p><a href="../../../../../project/project1/">Link to project 1</a></p>
+<p>The second part of the course dealt with testing the data to study how variables were related and affected each other. This could be seen via randomization tests and ANOVA/MANOVA/PERMANOVAs. In addition, we delved into regression (both linear and logistic) and calculating standard errors to determine if the data met the assumptions of normality. To understand if our models could predict well, we performed AUC, ROC and cross validations. The results of this can be seen in Project 2 that looks into how predictors like storm winds, cateogory, and pressure can determine if a storm is classified as major or minor.</p>
+<p><a href="../../../../../project/project2/">Link to project 2</a></p>
+<p>In the last portion of the course, we covered an introduction to Python and how we could transpose the our coding from R to Python. For example, DPLYR in R translated to pandas in Python. Python is said to be harder to set up and get started in if you are new to coding, but below, we’ll explore some of the functions you can perform using this coding language.</p>
+<div id="python" class="section level2">
+<h2>Python</h2>
+<p>First off, we can use Python like a calculator. Instead of using “&lt;-” to store, we can substitute with an equal sign.</p>
+<pre class="python"><code>four = 4
+two = 2
+four + two</code></pre>
+<pre><code>## 6</code></pre>
+<p>###Numpy</p>
+<pre class="python"><code>import numpy as np 
+x=np.array([7,8,9,10])
+x
+#we can further use numpy to work with this array</code></pre>
+<pre><code>## array([ 7,  8,  9, 10])</code></pre>
+<pre class="python"><code>print(x/10+1)
+#we can determine the size of the array with .shape</code></pre>
+<pre><code>## [1.7 1.8 1.9 2. ]</code></pre>
+<pre class="python"><code>x.shape </code></pre>
+<pre><code>## (4,)</code></pre>
+<pre class="python"><code>list=np.array([[7,8],[9,10]])
+list 
+#we can select certain elements from our list </code></pre>
+<pre><code>## array([[ 7,  8],
+##        [ 9, 10]])</code></pre>
+<pre class="python"><code>list[0,0] #this grabs the first element</code></pre>
+<pre><code>## 7</code></pre>
+<pre class="python"><code>list[0,:] #this grabs the first row </code></pre>
+<pre><code>## array([7, 8])</code></pre>
+<p><em>Here, we used function “numpy” to work with arrays. Grabbing elements is slightly different than R, because counting begins with 0 instead of 1.</em></p>
+<div id="reticulate" class="section level3">
+<h3>Reticulate</h3>
+<p>Below is a demonstration of how to use the “reticulate” function</p>
+<pre class="r"><code>library(reticulate)
+hi&lt;-&quot;Coding is&quot;
+first &lt;- (1:10)</code></pre>
+<pre class="python"><code>hi=&quot;cool&quot;
+first = [11,12,13,14,15,16,17,18,19,20]
+print(r.hi,hi) </code></pre>
+<pre><code>## Coding is cool</code></pre>
+<pre class="python"><code>print(r.first,first)</code></pre>
+<pre><code>## [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]</code></pre>
+<p><em>Above, we can see how R and Python interact in a Python cell, but is this possible in an R chunk?</em></p>
+<pre class="r"><code>cat(c(hi,py$hi))</code></pre>
+<pre><code>## Coding is cool</code></pre>
+<pre class="r"><code>cat(c(first,py$first))</code></pre>
+<pre><code>## 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20</code></pre>
+<p><em>Yes, it is possible to use reticulate in an R chunk and observe the full list when they are combined!</em></p>
+</div>
+</div>
+
+            
+
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../../../../js/docs.min.js"></script>
+<script src="../../../../../js/main.js"></script>
+
+<script src="../../../../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

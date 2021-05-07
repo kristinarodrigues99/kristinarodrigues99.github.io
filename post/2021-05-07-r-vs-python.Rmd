@@ -1,0 +1,16 @@
++++
+title = "R vs Python"
+description = "Differences between two competitive computer programming languages, including their drawbacks and benefits"
+tags = []
+categories = []
++++
+![](/post/2021-05-07-r-vs-python_files/whale.jpeg)
+
+```{r}
+print("hello world")
+```
+*Printing hello world is the first step to test that your program is running properly :)*
+
+```{r}
+1+1
+```

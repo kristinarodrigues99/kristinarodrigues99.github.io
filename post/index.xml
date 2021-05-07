@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on My Computational Biology Portfolio</title>
+    <link>/post/</link>
+    <description>Recent content in Posts on My Computational Biology Portfolio</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Fri, 07 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Diving into R and Python</title>
+      <link>/post/2021/05/07/diving-into-r-and-python/</link>
+      <pubDate>Fri, 07 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/post/2021/05/07/diving-into-r-and-python/</guid>
+      <description>The majority of this computational biology course has focused on programming language R, the language of statistics. We started off with data visualization, which included probability and plotting distributions. Next, we slipped into DPLYR so that we could learn to construct more elegant-looking tables and graphs. With DPLYR under our belts, we experimented with wrangling and tidying data to make it easier to work with. The results of this first unit can be seen in Project 1 that explores the effect certain storm factors have on sea level.</description>
+    </item>
+    
+  </channel>
+</rss>
