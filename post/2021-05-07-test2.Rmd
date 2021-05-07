@@ -46,7 +46,7 @@ list[0,:] #this grabs the first row
 *Here, we used function "numpy" to work with arrays. Grabbing elements is slightly different than R, because counting begins with 0 instead of 1.*
 
 ### Reticulate
-Below is a demonstration of how to use the "reticulate" function 
+Below is a demonstration of how to use the "reticulate" function. Reticulate is a function that allows you to work with both R and Python simultaneously and allow them a means of communication, if you will.  
 ```{r}
 library(reticulate)
 hi<-"Coding is"
